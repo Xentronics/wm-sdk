@@ -93,7 +93,7 @@ static const uint8_t m_attr_size_lut[] =
     MSAP_ATTR_PDU_BUFF_USAGE_SIZE,
     MSAP_ATTR_PDU_BUFF_CAP_SIZE,
     MSAP_ATTR_NBOR_COUNT_SIZE,
-    MSAP_ATTR_RESERVED_1_SIZE,
+    MSAP_ATTR_ENERGY_SIZE,
     MSAP_ATTR_AUTOSTART_SIZE,
     MSAP_ATTR_ROUTE_COUNT_SIZE,
     MSAP_ATTR_SYSTEM_TIME_SIZE,
@@ -609,7 +609,6 @@ static attribute_result_e readAttr(attr_t attr_id,
                                    uint8_t attr_size)
 {
     uint32_t tmp;   // Needed for 32-bit alignment
-    app_lib_state_route_info_t route_info;
     app_res_e result = APP_RES_OK;
     switch (attr_id)
     {
@@ -631,28 +630,15 @@ static attribute_result_e readAttr(attr_t attr_id,
             // Deprecated
             result = APP_RES_NOT_IMPLEMENTED;
             break;
+        case MSAP_ATTR_ENERGY:
+            result = lib_state->getEnergy((uint8_t *)&tmp);
+            break;
         case MSAP_ATTR_AUTOSTART:
             lib_storage->readPersistent(&tmp, sizeof(tmp));
             tmp &= MSAP_AUTOSTART;
             break;
         case MSAP_ATTR_ROUTE_COUNT:
-            // Initialize to no route
-            tmp = 0;
-            if (lib_state->getStackState() != APP_LIB_STATE_STARTED)
-            {
-                // Check if stack is started
-                result = APP_RES_INVALID_STACK_STATE;
-            }
-            else
-            {
-                result = lib_state->getRouteInfo(&route_info);
-                if (result == APP_RES_OK &&
-                    route_info.state == APP_LIB_STATE_ROUTE_STATE_VALID)
-                {
-                    // There is a route to sink
-                    tmp = 1;
-                }
-            }
+            result = lib_state->getRouteCount((size_t*)&tmp);
             break;
         case MSAP_ATTR_SYSTEM_TIME:
             tmp = 0;    /* Not handled here */
@@ -766,6 +752,9 @@ static attribute_result_e writeAttr(attr_t attr_id,
     }
     switch (attr_id)
     {
+        case MSAP_ATTR_ENERGY:
+            result = lib_state->setEnergy(tmp);
+            break;
         case MSAP_ATTR_AUTOSTART:
             if(tmp > 1)
             {

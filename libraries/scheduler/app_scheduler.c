@@ -22,9 +22,6 @@ static bool m_initialized = false;
 /** Measured time on nrf52 (13us) */
 #define EXECUTION_TIME_NEEDED_FOR_SCHEDULING_US    20
 
-/** Maximum execution time application can request from stack (100ms) */
-#define MAX_EXECUTION_TIME_ALLOWED_BY_STACK_US (100 * 1000)
-
 typedef struct
 {
     union {
@@ -447,14 +444,6 @@ app_scheduler_res_e App_Scheduler_addTask_execTime(task_cb_f cb,
     if (!m_initialized)
     {
         return APP_SCHEDULER_RES_UNINITIALIZED;
-    }
-
-    // Check that requested time is not higher than what stack allows
-    // minus our own execution time (for selecting next task)
-    if ((exec_time_us + EXECUTION_TIME_NEEDED_FOR_SCHEDULING_US)
-           > MAX_EXECUTION_TIME_ALLOWED_BY_STACK_US)
-    {
-        return APP_SCHEDULER_RES_TOO_LONG_EXECUTION_TIME;
     }
 
     Sys_enterCriticalSection();

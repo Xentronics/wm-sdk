@@ -32,7 +32,7 @@
 #define APP_LIB_SETTINGS_NAME 0x74ced676 //!< "SETTIN"
 
 /** @brief Maximum supported library version */
-#define APP_LIB_SETTINGS_VERSION 0x208
+#define APP_LIB_SETTINGS_VERSION 0x207
 
 /**
  * @brief AES key size in bytes
@@ -523,6 +523,47 @@ typedef app_res_e
     (*app_lib_settings_set_offline_scan_f)(uint16_t max_scan);
 
 /**
+ * @brief  Get the channel map (for releases < 3.5)
+ *
+ * Get the allocation between CF-MAC ("low-energy") and CB-MAC ("low-latency")
+ * channels. See WP-RM-100 - Wirepas Mesh Dual-MCU API Reference Manual for an
+ * explanation on CF-MAC and CB-MAC operation. LSB is the first available
+ * channel. A set bit indicates CB-MAC mode.
+ *
+ * @param   channelmap_p
+ *          Pointer to store the channelmap
+ *          Each set bit allocates the channel for CB-MAC. LSB is channel 1,
+ *          MSB is channel 32
+ * @return  Result code, @ref APP_RES_OK if successful,
+ *          APP_RES_INVALID_NULL_POINTER if @p channelmap_p is NULL
+ * @note    WM FW releases 3.5 and onwards calling this functions will return
+ *          an error code.
+ */
+typedef app_res_e
+    (*app_lib_settings_get_channel_map_f)(uint32_t * channelmap_p);
+
+/**
+ * @brief  Set the channel map (for releases < 3.5)
+ *
+ * Set the allocation between CF-MAC ("low-energy") and CB-MAC ("low-latency")
+ * channels. See @ref app_lib_settings_get_channel_map_f "lib_settings->getChannelMap"() function.
+ *
+ * At least one channel needs to be reserved for CF-MAC use, i.e. a bit must be
+ * zero.
+ *
+ * @param   channelmap
+ *          Each set bit allocates the channel for CB-MAC. LSB is channel 1,
+ *          MSB is channel 32
+ * @return  Result code, @ref APP_RES_OK if successful, @ref APP_RES_INVALID_VALUE
+ *          if @p channelmap is invalid, @ref APP_RES_INVALID_STACK_STATE if stack
+ *          is running
+ * @note    WM FW releases 3.5 and onwards calling this functions will return
+ *          an error code.
+ */
+typedef app_res_e
+    (*app_lib_settings_set_channel_map_f)(uint32_t channelmap);
+
+/**
  * @brief   Get network channel range
  *
  * Return the minimum and maximum network channel value that can be used when
@@ -718,6 +759,8 @@ typedef struct
     app_lib_settings_set_ac_range_f                 setAcRange;
     app_lib_settings_get_offline_scan_f             getOfflineScan;
     app_lib_settings_set_offline_scan_f             setOfflineScan;
+    app_lib_settings_get_channel_map_f              getChannelMap;
+    app_lib_settings_set_channel_map_f              setChannelMap;
     app_lib_settings_get_network_channel_limits_f   getNetworkChannelLimits;
     app_lib_settings_get_ac_range_limits_f          getAcRangeLimits;
     app_lib_settings_set_group_query_cb_f           registerGroupQuery;

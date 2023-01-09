@@ -18,7 +18,7 @@ else ifeq ($(MCU)$(MCU_SUB)$(MCU_MEM_VAR),efr32xg12pxxxf512)
     CFLAGS += -DEFR32FG12 -DEFR32FG12P232F1024GL125
     # Mcu instruction set
     ARCH=armv7e-m
-    HAL_SYSTEM_C := efr32fg12/system_efr32fg12p.c
+    #HAL_SYSTEM_C := efr32fg12/system_efr32fg12p.c
 else ifeq ($(MCU)$(MCU_SUB),efr32xg21)
     ifeq ($(radio),bgm210pa22jia)
         HW_MAGIC=0C

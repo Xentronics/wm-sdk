@@ -111,7 +111,7 @@ BOARD_CONFIG := $(BOARD_FOLDER)/config.mk
 -include $(BOARD_CONFIG)
 
 # Include makefile for mcu family
--include $(MCU_PATH)$(MCU_FAMILY)/makefile
+include $(MCU_PATH)$(MCU_FAMILY)/makefile
 
 # Folder for Wirepas stack binary image
 IMAGE_PATH := image/

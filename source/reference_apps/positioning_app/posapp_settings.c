@@ -72,10 +72,14 @@ void get_default_settings(poslib_settings_t * settings)
     settings->da.follow_network = POSLIB_DA_FOLLOW_NETWORK;
 }
 
-static void stack_state_cb(app_lib_stack_event_e event, void * param)
+static void stack_state_cb(stack_state_event_e event)
 {
     app_res_e res;
-    // We are registered only for Stack stopped event
+    if (event != STACK_STATE_STOPPED_EVENT)
+    {
+        // only interested by stopped event
+        return;
+    }
     res = lib_settings->setNodeRole(m_new_role);
 
     if (res == APP_RES_OK)
@@ -209,7 +213,7 @@ static void check_role(poslib_settings_t * settings, bool force_set_role)
     if (force_set_role && role != new_role)
     {
         app_res_e res;
-        res = Stack_State_addEventCb(stack_state_cb, 1 << APP_LIB_STATE_STACK_EVENT_STACK_STOPPED);
+        res = Stack_State_addEventCb(stack_state_cb);
 
         if (res != APP_RES_OK)
         {

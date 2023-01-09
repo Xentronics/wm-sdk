@@ -13,15 +13,15 @@
  *  - Bootloader config: memory areas, auth. and encryption keys (BLCONFIG)
  *  - Executable code (FLASH)
  *
- * Dedicated 32 kB bootloader Flash area is not used.
+ * Dedicated 16 kB bootloader Flash area is not used.
  */
 
 SEARCH_DIR(.)
 
 MEMORY
 {
-    BOOTLOADER (rx)   : ORIGIN = 0x08000000,            LENGTH = 32K - 1K
-    BLCONFIG (rx)     : ORIGIN = 0x08000000 + 31K,      LENGTH = 1K
+    BOOTLOADER (rx)   : ORIGIN = 0x08000000,            LENGTH = 16K - 1K
+    BLCONFIG (rx)     : ORIGIN = 0x08000000 + 15K,      LENGTH = 1K
     BL_STATIC (rwx)   : ORIGIN = 0x20000000 + 24,       LENGTH = 1024
     RAM (rwx)         : ORIGIN = 0x20001500,            LENGTH = 64K - 0x1500
     INVALID (rwx)     : ORIGIN = 0xFFFFFFFF,            LENGTH = 0

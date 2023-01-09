@@ -24,6 +24,7 @@
 #include "app_scheduler.h"
 #include "shared_data.h"
 #include "shared_appconfig.h"
+#include "shared_neighbors.h"
 #include "stack_state.h"
 #include "ds.h"
 
@@ -33,7 +34,7 @@
 /** Max timeout to handle a request queued from uart
  *  API says 300ms
  */
-#define WAPS_MAX_REQUEST_QUEUING_TIME_MS    450
+#define WAPS_MAX_REQUEST_QUEUING_TIME_MS    300
 
 /** Convert MS to coarse
  *  Because of 1/128s granularity and way it is measured, delay can be shorter but it is not an issue.
@@ -97,7 +98,7 @@ static void app_config_received_cb(uint16_t type,
                                    uint8_t * value_p);
 
 /** Callback when a neighbor scan is done */
-static void on_scanned_nbors_cb(app_lib_stack_event_e event, void * param);
+static void on_scanned_nbors_cb(const app_lib_state_neighbor_scan_info_t * scan_info);
 
 /**
  * \brief   Process request and generate reply
@@ -180,8 +181,8 @@ bool Waps_init(uint32_t baudrate, bool flow_ctrl)
         .call_cb_always = true,
     };
 
-    // We are only interested by SCAN_STOPPED event
-    Stack_State_addEventCb(on_scanned_nbors_cb, 1 << APP_LIB_STATE_STACK_EVENT_SCAN_STOPPED);
+    // id is not persistent as we never release it (for now)
+    Shared_Neighbors_addScanNborsCb(on_scanned_nbors_cb, &id);
     //register callbacks
     Shared_Data_addDataReceivedCb(&m_waps_data_filter);
     Shared_Appconfig_addFilter(&app_config_filter, &id);
@@ -331,18 +332,15 @@ static void app_config_received_cb(uint16_t type,
     }
 }
 
-static void on_scanned_nbors_cb(app_lib_stack_event_e event, void * param)
+static void on_scanned_nbors_cb(const app_lib_state_neighbor_scan_info_t * scan_info)
 {
-    app_lib_state_neighbor_scan_info_t * scan_info = (app_lib_state_neighbor_scan_info_t *) param;
-    if (!scan_info->complete ||
-        scan_info->scan_type != SCAN_TYPE_APP_ORIGINATED)
-    {
-        // Discard scan result not initiated by app or
-        // those that are not full
-        // All scan could generate an indication but Wirepas Terminal is not ready for that
-        return;
-    }
-
+// The next block is under ifdef has dualmcu has never generated
+// Neighbors indication. It was only registering for requested scans
+// result that are requested by app, but dualmcu cannot ask for scans.
+// Since Sharedd_neighbors libs is in use, scan result from stack will
+// trigger this callback and Wirepas Terminal doesn't handle it (stay stuck).
+// So for now, it has to be explicitly enabled.
+#ifdef GENERATE_NEIGHBORS_INDICATION
     // Find similar indication and re-use ite
     waps_item_t * item = find_indication(WAPS_FUNC_MSAP_SCAN_NBORS_IND);
     bool is_new = false;
@@ -359,6 +357,7 @@ static void on_scanned_nbors_cb(app_lib_stack_event_e event, void * param)
     {
         add_indication(item);
     }
+#endif
 }
 
 void Waps_packetSent(app_lib_data_tracking_id_t tracking_id,

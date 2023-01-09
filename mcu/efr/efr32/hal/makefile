@@ -26,11 +26,6 @@ INCLUDES += -I$(EFR32_VENDOR_PREFIX)rail_lib/chip/efr32/efr32xg2x
 INCLUDES += -I$(EFR32_VENDOR_PREFIX)rail_lib/common
 endif
 
-ifeq ($(MCU_SUB), xg23)
-INCLUDES += -I$(EFR32_VENDOR_PREFIX)rail_lib/chip/efr32/efr32xg2x
-INCLUDES += -I$(EFR32_VENDOR_PREFIX)rail_lib/common
-endif
-
 ifeq ($(HAL_BUTTON), yes)
 SRCS += $(EFR32_HAL_PREFIX)button.c
 endif

@@ -1,0 +1,65 @@
+docker run --rm -v /c/wirepas/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=custom_app target_board=pca10040
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=custom_app target_board=pca10056
+
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=custom_app target_board=pca10056 clean
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=blink target_board=pca10056
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+To flash your target device:
+
+nrfjprog.exe --recover
+nrfjprog.exe -f NRF52 --program C:\wm-sdk\build\pca10056\custom_app\custom_app.hex --verify --reset
+nrfjprog.exe -f NRF52 --program C:\wm-sdk\build\pca10056\custom_app\final_image_custom_app.hex --verify --reset
+nrfjprog.exe -f NRF52 --program C:\wm-sdk\build\pca10056\blink\blink.hex --verify --reset
+nrfjprog.exe -f NRF52 --program C:\wm-sdk\build\pca10056\dualmcu_app\final_image_dualmcu_app.hex --verify --reset
+nrfjprog.exe -f NRF52 --program C:\wm-sdk\build\pca10056\evaluation_app\final_image_evaluation_app.hex --verify --reset
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------------
+[SET UP WIREPAS LOCAL NETWORK]
+
+Build the dualmcu_app application 
+docker run --rm -v <absolute path to Wirepas SDK folder>/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:<tag version> make app_name=<application name to build> target_board=<board name used for node> 
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=dualmcu_app target_board=pca10056
+
+
+Build the evaluation_app application 
+docker run --rm -v <absolute path to Wirepas SDK folder>/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:<tag version> make app_name=<application name to build> target_board=<board name used for node> 
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=evaluation_app target_board=pca10056
+docker run --rm -v /c/wm-sdk:/home/wirepas/wm-sdk -w /home/wirepas/wm-sdk -ti wirepas/sdk-builder:v1.2 make app_name=first_app target_board=my_pca10056
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+To set up a project we need to:
+Create your own board:    For example --> C:\wm-sdk\board\my_pca10056
+Modify/Tweak:
+- config.mk
+- makefile
+
+
+--------------------------------------------------------------------------------------------------------------------------------------------------------
+links chat
+https://developer.wirepas.com/support/solutions/articles/77000498916-getting-started-with-wirepas-massive-for-developers
+
+wirepas-support6:26 PM
+https://github.com/wirepas/wm-sdk/tree/master/source/example_apps/ruuvi_evk
+
+wirepas-support6:37 PM
+https://wirepas.github.io/wm-sdk/master/d7/d28/application_operation.html#cooperative_mcu_access
+
+Vafa Shams6:47 PM
+Mariano - 20 min video of practical experimentation with SDK and Github
+https://www.youtube.com/watch?v=20nKlFP4ENE
+
+Vafa Shams6:49 PM
+Mariano - A series of videos in Wirepas technical track https://www.youtube.com/watch?v=47G6ee1FFLc&list=PLeU1gpvQWySAO-4gEZw7nXuW6EU2XjyYE
+
+Pls also subscribe to Wirepas youtube channel https://www.youtube.com/@Wirepas/videos
+
+wirepas-support7:12 PM
+https://developer.wirepas.com/support/solutions/articles/77000525397-wirepas-mesh-network-and-devices-parameters-guidelines-for-developers
+
+C:\wm-sdk\mcu\nrf\common\vendor\hal\nrf_gpio.h

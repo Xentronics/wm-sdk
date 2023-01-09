@@ -21,16 +21,3 @@ board_hw_hfxo_ctune=106
 ## LFXO crystal characteristics
 board_hw_lfxo_ctune=63
 board_hw_lfxo_gain=2
-
-# Custom power table
-# if set, the custom power table will be set during application startup,
-# and the stack will use that instead of the default one.
-# For convenience, +13dBm, +16dBm and +20dBm power tables are provided as examples.
-# - mcu/efr/efr32/hal/radio/radio_power_table_efr32xg23_13dbm.h
-# - mcu/efr/efr32/hal/radio/radio_power_table_efr32xg23_16dbm.h
-# - mcu/efr/efr32/hal/radio/radio_power_table_efr32xg23_20dbm.h
-# If predefined custom power table shall be used,
-# provide radio_power_table=13/16/20 as build parameter.
-ifneq ("$(radio_power_table)", "")
-    RADIO_CUSTOM_POWER_TABLE=mcu/efr/efr32/hal/radio/radio_power_table_efr32xg23_$(radio_power_table)dbm.h
-endif

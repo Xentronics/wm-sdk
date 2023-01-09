@@ -337,7 +337,7 @@ static void stop_tag()
     }
 }
 
-void PosLibDa_stop()
+void PosLibDa_Stop()
 {
     stop_router();
     stop_tag();

@@ -67,7 +67,7 @@ Open Joining protocol</td></tr>
 </td><td>Access to non-volatile memory areas</td></tr>
 <tr><td>@ref wms_otap.h</td><td>@ref app_lib_otap_t "lib_otap"</td><td>The
 Over-The-Air-Programming (OTAP) library</td></tr>
-<tr><td>@ref wms_radio_config.h</td><td>@ref app_lib_radio_cfg_t "lib_radio_config"</td>
+<tr><td>@ref radio_config.h</td><td>@ref app_lib_radio_cfg_t "lib_radio_config"</td>
 <td>Application library for radio power and front end module control</td></tr>
 <tr><td>@ref wms_settings.h</td><td>@ref app_lib_settings_t "lib_settings"</td><td>
 Access to node settings, which are stored in nonvolatile memory</td></tr>

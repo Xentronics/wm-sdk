@@ -32,6 +32,8 @@
 #include "debug_log.h"
 
 
+//#define ENABLE_LOW_LATENCY_MODE 1
+
 /** Convert message travel delay from 1/128th second to milliseconds. */
 #define COARSE_TO_MS(delay)    (1000u * (delay) >> 7)
 

@@ -9,7 +9,7 @@ SEARCH_DIR(.)
 /* Flash is 512 kB and RAM is 64 kB RAM */
 MEMORY
 {
-    FLASH (rx)        : ORIGIN = 0x08000000 + 32K,          LENGTH = 480K
+    FLASH (rx)        : ORIGIN = 0x08000000 + 16K,          LENGTH = 480K
     RAM (rwx)         : ORIGIN = 0x20000000 + 512           LENGTH = 64K - 512
     STACK_GUARD (rwx) : ORIGIN = 0x20000000 + 28K - 8,      LENGTH = 8
     /* Stack is here: 4 kB */

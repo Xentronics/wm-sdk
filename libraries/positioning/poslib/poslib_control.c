@@ -3,6 +3,7 @@
  * @brief      contains the routines with Poslib API and general control.
  * @copyright  Wirepas Ltd 2021
  */
+
 #define DEBUG_LOG_MODULE_NAME "POSLIB CONTROL"
 #ifdef DEBUG_POSLIB_LOG_MAX_LEVEL
 #define DEBUG_LOG_MAX_LEVEL DEBUG_POSLIB_LOG_MAX_LEVEL
@@ -26,9 +27,6 @@
 #include "shared_appconfig.h"
 #include "shared_offline.h"
 #include "poslib_mbcn.h"
-#ifdef ROUTE_CHECK
-#include "stack_state.h"
-#endif
 
 /** Module internal type definitions */
 
@@ -160,7 +158,7 @@ static void data_send_cb(const app_lib_data_sent_status_t * status)
 }
 
 #ifdef ROUTE_CHECK
-static void route_cb(app_lib_stack_event_e event, void * param)
+static void route_cb(void)
 {
     PosLibEvent_add(POSLIB_CTRL_EVENT_ROUTE_CHANGE);
 }
@@ -302,8 +300,8 @@ static bool register_callbacks(void)
     #ifdef ROUTE_CHECK
     /** Route change callback */
     {
-        app_res_e res = Stack_State_addEventCb(route_cb,
-                                               1 << APP_LIB_STATE_STACK_EVENT_ROUTE_CHANGED);
+        app_res_e res;
+        res = lib_state->setRouteCb(route_cb, 0);  //FixMe: add shared library
         if (res != APP_RES_OK)
         {
             ret = false;
@@ -341,10 +339,8 @@ static void deregister_callbacks(void)
         }
     }
 
-    #ifdef ROUTE_CHECK
     /** Route change callback */
-    Stack_State_removeEventCb(route_cb);
-    #endif
+    lib_state->setRouteCb(NULL, 0); //FixMe: add shared library
 }
 
 
@@ -898,15 +894,15 @@ static uint8_t send_measurement_message()
 
 static uint32_t get_scan_duration()
 {
-    uint32_t scan_duration_ms = 0;
+    uint32_t scan_duration_us = APP_LIB_STATE_DEFAULT_SCAN;
     
     if (m_pos_settings.mbcn.enabled && 
         m_pos_settings.mbcn.tx_interval_ms < 1000)
     {
-        scan_duration_ms = m_pos_settings.mbcn.tx_interval_ms;
-        scan_duration_ms +=  scan_duration_ms / SCAN_MARGIN_RATIO;
+        scan_duration_us = m_pos_settings.mbcn.tx_interval_ms * 1000;
+        scan_duration_us +=  scan_duration_us / SCAN_MARGIN_RATIO;
     }
-    return scan_duration_ms;
+    return scan_duration_us;
 }
 
 static uint32_t trigger_update_task()
@@ -942,7 +938,7 @@ static uint32_t trigger_update_task()
     //Stack online - trigger scan
     poslib_scan_ctrl_t scan_ctrl = {
         .mode = SCAN_MODE_STANDARD,
-        .max_duration_ms = get_scan_duration()};
+        .max_duration_us = get_scan_duration()};
     PosLibMeas_startScan(&scan_ctrl);
 
     LOG(LVL_DEBUG, "Update triggered at %u", lib_time->getTimestampS());
@@ -1203,7 +1199,6 @@ static void handle_idle_state(poslib_internal_event_t * event)
             {
                 m_motion_mode = MOTION_DEFAULT;
             }
-            PosLibBle_start(&m_pos_settings.ble);
             /* Configuration changed, re-schedule*/
             schedule_next(false);
             break;

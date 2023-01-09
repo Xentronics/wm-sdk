@@ -265,7 +265,7 @@ Octets are transferred most significant bit first.
 ## Timing
 
 There is a reception timeout for received UART frames. A transmission of
-complete API frame to the stack MCU shall take no longer than 450 ms.
+complete API frame to the stack MCU shall take no longer than 300 ms.
 
 ## CRC Calculation (CRC-16-CCITT)
 
@@ -409,10 +409,6 @@ to set parameters. The DSAP-DATA_TX service includes the following primitives:
 
 -   DSAP-DATA_TX_TT.confirm
 
--   DSAP-DATA_TX_FRAG.request
-
--   DSAP-DATA_TX_FRAG.confirm
-
 -   DSAP-DATA_TX.indication
 
 -   DSAP-DATA_TX.response (All response primitives have the same format, see
@@ -532,7 +528,8 @@ Frame fields are described in the table below.
 | *TXOptions*           | 1        | 00xx xxxx  (bitfield, where x can be 0 or 1) | See description in chapter [DSAP-DATA_TX.request](#DSAP-DATA_TX.request)
 | *BufferingDelay*      | 4        | 0 – 4 294 967 295                            | See description in chapter [DSAP-DATA_TX_TT.request](#DSAP-DATA_TX_TT.request)
 | *FullPacketId*        | 2        | 0 – 4095                                     | Id of the full message this fragment belongs. Only lowest twelve bits are meaningful.
-| *FragmentOffset and flags*      | 2        |  see Description                    | - Bits 0..11:<p> Offset of this fragment inside the full packet (between 0 and 1499) <p> - Bits 12..14:<p> Reserved <p>- Bit 15:<p> Set if fragment is last one of full message
+| *FullPacketSize*      | 2        | 1 - 1500                                     | Full size of the packet this fragment belongs.
+| *FragmentOffset*      | 2        | 0 - 1499                                     | Offset of this fragment inside the full packet.
 | *APDULength*          | 1        | 1 – 102                                      | Size of this current fragment.
 | *APDU*                | 1 – 102  | \-                                           | See description in chapter [DSAP-DATA_TX.request](#DSAP-DATA_TX.request)
 | *CRC*                 | 2        | \-                                           | See section [General Frame Format](#General-Frame-Format)
@@ -618,7 +615,8 @@ below.
 | *QoS + Hop count*     | 1        | 0 – 255          | Bits 0-1 (LSB): Quality of service class to be used. The different values are defined as follows:  <p> - 0 = Use traffic class 0, i.e. normal priority 1 = Use traffic class 1, i.e. high priority <p> - Bits 2-7: Hop count: how many hops were used to transmit the data to the destination (1-n hops)<p> For example, value 0x29 (0b00101001) tells that high priority data was received and ten hops were used to transmit data to the destination.
 | *TravelTime*          | 4        | \-               | Travel time of the PDU on the network. Reported in units of *TravelTime / 128* seconds i.e. *TravelTime \* 7.8125* milliseconds.
 | *FullPacketId*        | 2        | 0 – 4095         | Id of the full message this fragment belongs. Only lowest twelve bits are meaningful
-| *FragmentOffset and flags*      | 2        |  see Description                    | - Bits 0..11:<p> Offset of this fragment inside the full packet (between 0 and 1499) <p> - Bits 12..14:<p> Reserved <p>- Bit 15:<p> Set if fragment is last one of full message
+| *FullPacketSize*      | 2        | 1 - 1500         | Full size of the packet this fragment belongs
+| *FragmentOffset*      | 2        | 0 - 1499         | Offset of this fragment inside the full packet.
 | *APDULength*          | 1        | \-               | The length of the following fragment in octets
 | *APDU*                | 1 – 102  | \-               | Application payload
 | *CRC*                 | 2        | \-               | See section [General Frame Format](#General-Frame-Format)

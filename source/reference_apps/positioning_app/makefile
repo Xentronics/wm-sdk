@@ -63,10 +63,6 @@ endif
 APP_SCHEDULER=yes
 APP_SCHEDULER_TASKS=4
 
-# App need it to register for stop stack event
-STACK_STATE_LIB=yes
-STACK_STATE_CBS=1
-
 # MOTION support
 ifneq ($(motion_sensor),)
 INCLUDES += -I$(SRCS_PATH)/motion/

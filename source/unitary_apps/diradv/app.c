@@ -30,7 +30,6 @@
 #include "button.h"
 #include "shared_data.h"
 #include "app_scheduler.h"
-#include "stack_state.h"
 
 // How often diradv scans and sends data (in useconds)
 #define SCAN_PERIOD_MS (60*1000)
@@ -127,9 +126,9 @@ static void beacon_listen_cb(const app_lib_state_beacon_rx_t * beacon)
  */
 static uint32_t start_scan(void)
 {
-    // Start scanning for stack default time
-    // Scan will be aborted if we find a neighbor
+    // Start scanning max for 1 seconds
     m_is_scanning = true;
+    lib_state->setScanDuration(1000000);
     lib_state->startScanNbors();
     // Enable led
     Led_set(0, true);
@@ -140,12 +139,8 @@ static uint32_t start_scan(void)
 /**
  * \brief   Scan ended
  */
-static void scan_ended(app_lib_stack_event_e event, void * param_p)
+static void scan_ended(const app_lib_state_neighbor_scan_info_t * scan_info)
 {
-    app_lib_state_neighbor_scan_info_t * scan_info;
-
-    scan_info = (app_lib_state_neighbor_scan_info_t *) param_p;
-
     if (scan_info->complete == true &&
         scan_info->scan_type == SCAN_TYPE_APP_ORIGINATED)
     {
@@ -224,7 +219,7 @@ void App_init(const app_global_functions_t * functions)
                                        SCAN_PERIOD_MS,
                                        1000);
         // Set scan end callback. Turns off the led if nothing was found
-        Stack_State_addEventCb(scan_ended, 1 << APP_LIB_STATE_STACK_EVENT_SCAN_STOPPED);
+        lib_state->setOnScanNborsCb(scan_ended);
         // Callback when data has been sent. Turns off the led.
         lib_data->setDataSentCb(data_sent_cb);
     }

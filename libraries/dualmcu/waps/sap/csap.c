@@ -56,7 +56,7 @@ static const uint8_t m_attr_size_lut[] =
     CSAP_ATTR_STACK_PROFILE_SIZE,
     CSAP_ATTR_RESERVED_1_SIZE,
     CSAP_ATTR_OFFLINE_SCAN_SIZE,
-    CSAP_ATTR_RESERVED_3_SIZE,
+    CSAP_ATTR_CHANNEL_ALLOC_MAP_SIZE,
     CSAP_ATTR_FEATURE_LOCK_BITS_SIZE,
     CSAP_ATTR_FEATURE_LOCK_KEY_SIZE,
     CSAP_ATTR_RESERVED_2_SIZE,
@@ -345,6 +345,9 @@ static attribute_result_e readAttr(attr_t attr_id,
         case CSAP_ATTR_FEATURE_LOCK_KEY:
             result = lib_settings->getFeatureLockKey(NULL);
             break;
+        case CSAP_ATTR_CHANNEL_ALLOC_MAP:
+            result = lib_settings->getChannelMap(&tmp);
+            break;
         case CSAP_ATTR_RESERVED_CHANNELS:
             /* Determine actual attribute size, which can vary */
             attr_size = (get_num_channels() + 7) / 8;
@@ -360,7 +363,6 @@ static attribute_result_e readAttr(attr_t attr_id,
             break;
         case CSAP_ATTR_RESERVED_1:
         case CSAP_ATTR_RESERVED_2:
-        case CSAP_ATTR_RESERVED_3:
         default:
             /* Unsupported attribute */
             result = APP_RES_NOT_IMPLEMENTED;
@@ -538,6 +540,9 @@ static attribute_result_e writeAttr(attr_t attr_id,
         case CSAP_ATTR_OFFLINE_SCAN:
             result = lib_settings->setOfflineScan(tmp);
             break;
+        case CSAP_ATTR_CHANNEL_ALLOC_MAP:
+            result = lib_settings->setChannelMap(tmp);
+            break;
         case CSAP_ATTR_FEATURE_LOCK_BITS:
             result = lib_settings->setFeatureLockBits(tmp);
             break;
@@ -549,7 +554,6 @@ static attribute_result_e writeAttr(attr_t attr_id,
             break;
         case CSAP_ATTR_RESERVED_1:
         case CSAP_ATTR_RESERVED_2:
-        case CSAP_ATTR_RESERVED_3:
         default:
             // Unsupported attribute
             result = APP_RES_NOT_IMPLEMENTED;

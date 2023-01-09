@@ -9,7 +9,6 @@
 #include "provisioning.h"
 #include "provisioning_int.h"
 #include "app_scheduler.h"
-#include "stack_state.h"
 
 #define DEBUG_LOG_MODULE_NAME "JOIN LIB"
 #define DEBUG_LOG_MAX_LEVEL LVL_INFO
@@ -138,7 +137,7 @@ static void joining_beacon_rx_cb(
 /**
  * \brief   Route changed callback. Raises route_change event.
  */
-static void route_changed_cb(app_lib_stack_event_e event, void * param)
+void route_changed_cb(void)
 {
     LOG(LVL_INFO, "Event : ROUTE CHANGE.");
     m_events.route_change = 1;
@@ -184,7 +183,7 @@ static void reset_joining(bool stopJoining)
         lib_joining->stopJoiningProcess();
     }
     App_Scheduler_cancelTask(timeout_task);
-    Stack_State_removeEventCb(route_changed_cb);
+    lib_state->setRouteCb(NULL, 0);
     m_state = JOIN_STATE_IDLE;
     memset(&m_events,0,sizeof(m_events));
 }
@@ -333,8 +332,7 @@ static uint32_t state_wait_scan_end(void)
                     }
                     else
                     {
-                        // Interested by ROUTE changed event
-                        Stack_State_addEventCb(route_changed_cb, 1 << APP_LIB_STATE_STACK_EVENT_ROUTE_CHANGED);
+                        lib_state->setRouteCb(route_changed_cb, 0);
                         m_state = JOIN_STATE_WAIT_ROUTE_CHANGE;
                         if (App_Scheduler_addTask_execTime(timeout_task,
                                                   DELAY_WAIT_END_JOINING_MS,
@@ -445,7 +443,7 @@ static uint32_t state_wait_route_change(void)
     else
     {
         App_Scheduler_cancelTask(timeout_task);
-        Stack_State_removeEventCb(route_changed_cb);
+        lib_state->setRouteCb(NULL, 0);
         LOG(LVL_INFO, "State WAIT_ROUTE_CHANGE : "
                       "network joined successfully (next_hop: %u).",
                       info.next_hop);
@@ -456,7 +454,7 @@ static uint32_t state_wait_route_change(void)
     if(m_events.timeout)
     {
         LOG(LVL_WARNING, "State WAIT_ROUTE_CHANGE : timeout.");
-        Stack_State_removeEventCb(route_changed_cb);
+        lib_state->setRouteCb(NULL, 0);
 
         m_retry++;
 
